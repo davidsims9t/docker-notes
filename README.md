@@ -130,3 +130,26 @@ To view logs from a container use:
 ```
 docker logs container_id
 ```
+
+## Docker Images
+
+Docker images contain a series of layers. To see the layers an image has use:
+
+```
+docker history image
+```
+
+1. All changes made to a running containers will be written to a writable layer.
+2. When the container is deleted, the writable layer is also deleted, but the underlying image remains unchanged.
+3. Multiple containers can share access to the same underlying image.
+
+## Ways to Build an Image
+
+1. Create a Dockerfile.
+2. Commit changes made to a Docker container.
+
+To commit your Docker changes use:
+
+```
+docker commit container_id repository_name:tag
+```
