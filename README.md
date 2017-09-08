@@ -153,3 +153,47 @@ To commit your Docker changes use:
 ```
 docker commit container_id repository_name:tag
 ```
+
+## Dockerfile
+
+To install an image use:
+
+```
+FROM image
+```
+
+To run a command use:
+
+```
+RUN apt-get update
+```
+
+To build a container from a Dockerfile use:
+
+```
+docker build
+```
+
+- Optionally you can specify the build context.
+- When the build starts the build context gets saved to a tarball.
+- The tarball is then transferred to the daemon.
+
+## Chain Run Command
+
+- Each run command executes on the top writeable layer and then commits the change.
+- The new image is then used for the next step in the Dockerfile.
+- Each run command creates a new image layer.
+- Its recommended to chain the run commands to minimize the new image layers.
+
+## Sort Multi-Lines Arguments Alphanumerically
+
+- This will help you avoid duplication.
+
+## CMD
+
+- Specifies which command to run when the container starts.
+- If we don't specify the CMD command in the Dockerfile, Docker will use the default command from the image.
+- The CMD instruction doesn't run when building the image.
+- You can specify the command in either exec form or shell form.
+
+## Docker Cache
