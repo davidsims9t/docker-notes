@@ -38,7 +38,7 @@ Example:
 - Application B - Container B
   - JRE 7
 
-### Docker Client
+## Docker Client
 
 docker build - Docker daemon
 docker pull - Docker daemon
@@ -51,16 +51,16 @@ Docker Daemon
 
 Docker engine - run on remote docker daemon or local.
 
-### Docker Concepts
+## Docker Concepts
 
-#### Images
+### Images
 
 - Images are read as templates used to create containers.
 - Images are created with the docker build command, either by us or by other docker users.
 - Images are composed of layers of other images.
 - Images are stored in Docker registry.
 
-#### Containers
+### Containers
 
 - If an image is a class, then a container is an instance of a class - a runtime object.
 - Containers are lightweight and portable encapsulations of an environment in which to run programs.
@@ -72,3 +72,61 @@ Docker engine - run on remote docker daemon or local.
 - You can host your own registry, or you can use Docker public registry which is called DockerHub.
 - Inside a registry, images are stored repositories.
 - Docker repository is a collection of different docker images with the same name, that have different tags, each tag usually means a different version of the image.
+- DockerHub is a popular service for repositories.
+- Official names are reviewed by DockerHub.
+- If you don't specify a tag, it defaults to latest.
+- Docker will use the local image first if it's available, otherwise it will download it from the network.
+
+## Commands
+
+To list available images use:
+
+```
+docker images
+```
+
+To use an image to echo "hello world":
+
+```
+docker run image echo "hello world"
+```
+
+Use -i -t for interactive.
+
+To view currently running Docker containers use:
+
+```
+docker ps
+```
+
+To use all previous ran containers use -a.
+
+To remove a container use:
+
+```
+docker run image --rm
+```
+
+To name a container use --name.
+
+Use -d to run in detached mode.
+
+To view low-level docker container information use:
+
+```
+docker inspect
+```
+
+## Docker Ports & Logging
+
+To run docker on a specific port use:
+
+```
+docker run -it -p host_port:container_port tomcat:8.0
+```
+
+To view logs from a container use:
+
+```
+docker logs container_id
+```
