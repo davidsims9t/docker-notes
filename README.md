@@ -15,6 +15,8 @@
 - [Sort Multi-Lines Arguments Alphanumerically](#sort-multi-lines-arguments-alphanumerically)
 - [CMD](#cmd)
 - [Push Images to DockerHub](#push-images-to-dockerhub)
+- [Containerization An Application](#containerize-an-application)
+- [Docker Container Links](#docker-container-links)
 
 ## Hypervisor-based Virtualization
 
@@ -274,6 +276,40 @@ To run a command inside a container use:
 
 ```
 docker exec -it image_id bash
+```
+
+## Docker Container Links
+
+Allows containers to communicate with each other. Requires a recipient container (i.e. Dockerapp) and a source container (i.e. Redis).
+
+First run the container with:
+
+```
+docker run -d --name redis redis:3.2.0
+```
+
+Then run the Dockerapp container by using:
+
+```
+docker run -d -p 5000:5000 --link redis dockerapp:v0.3
+```
+
+Benefits of Docker Container Links:
+
+- When you build an application with a micro-service architecture, it allows to run many
+independent applications in different containers to connect with one another.
+- Creates a secure tunnel between containers that doesn't need to expose any ports externally.
+
+## Docker Compose
+
+- Manual linking containers doesn't make sense when there's a lot of different containers (20+).
+- Docker Network allows all services to connect to each other.
+- Removes the burden of maintaining scripts for Docker orchestration.
+
+To start docker services use:
+
+```
+docker-compose up
 ```
 
 ## Credit
