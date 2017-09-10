@@ -249,3 +249,29 @@ To push your repo use:
 ```
 docker push username/repo
 ```
+
+## Containerize An Application
+
+To build the container use:
+
+```
+docker build -t dockerapp:v1.0 .
+```
+
+To run docker container use:
+
+```
+docker run -d -p 5000:5000 image_id
+```
+
+To find out where the docker container is running use:
+
+```
+docker-machine ls
+```
+
+To run a command inside a container use:
+
+```
+docker exec -it image_id bash
+```
