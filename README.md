@@ -2,19 +2,19 @@
 
 ## Table of Contents
 
-- [Hypervisor-based Virtualization] (#hypervisor-based-virtualization)
-- [Container Based] (#container-based)
-- [Docker Client] (#docker-client)
-- [Docker Concepts] (#docker-concepts)
-- [Commands] (#commands)
-- [Docker Ports & Logging] (#docker-ports--logging)
-- [Docker Images] (#docker-images)
-- [Ways to Build an Image] (#ways-to-build-an-image)
-- [Dockerfile] (#dockerfile)
-- [Chain Run Command] (#chain-run-command)
-- [Sort Multi-Lines Arguments Alphanumerically] (#sort-multi-lines-arguments-alphanumerically)
-- [CMD] (#cmd)
-- [Push Images to DockerHub] (#push-images-to-dockerhub)
+- [Hypervisor-based Virtualization](#hypervisor-based-virtualization)
+- [Container Based](#container-based)
+- [Docker Client](#docker-client)
+- [Docker Concepts](#docker-concepts)
+- [Commands](#commands)
+- [Docker Ports & Logging](#docker-ports--logging)
+- [Docker Images](#docker-images)
+- [Ways to Build an Image](#ways-to-build-an-image)
+- [Dockerfile](#dockerfile)
+- [Chain Run Command](#chain-run-command)
+- [Sort Multi-Lines Arguments Alphanumerically](#sort-multi-lines-arguments-alphanumerically)
+- [CMD](#cmd)
+- [Push Images to DockerHub](#push-images-to-dockerhub)
 
 ## Hypervisor-based Virtualization
 
