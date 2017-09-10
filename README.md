@@ -17,6 +17,7 @@
 - [Push Images to DockerHub](#push-images-to-dockerhub)
 - [Containerization An Application](#containerize-an-application)
 - [Docker Container Links](#docker-container-links)
+- [Docker Compose](#docker-compose)
 
 ## Hypervisor-based Virtualization
 
@@ -310,6 +311,30 @@ To start docker services use:
 
 ```
 docker-compose up
+```
+
+To view Docker compose logs use:
+
+```
+docker-compose logs
+```
+
+To stop Docker containers use:
+
+```
+docker-compose stop
+```
+
+To remove all Docker containers use:
+
+```
+docker-compose rm --all
+```
+
+To force a rebuild of an image use:
+
+```
+docker-compose build
 ```
 
 ## Credit
