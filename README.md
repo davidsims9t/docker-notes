@@ -221,9 +221,31 @@ docker images
 ```
 
 - In order to push the image you must first link the image to a Docker account.
-- Name the repository something like dsims/repo
+- Name the repository something like username/repo
 - To push a repo use:
 
 ```
-docker tag
+docker tag hash_id username/repo
+```
+
+## Latest Tag
+
+- Docker will use latest as a default tag when no tag is provided.
+- A lot of repositories use it to tag the most up-to-date stable image, however,
+this is still only a convention and is entirely not enforced.
+- Images which are tagged latest will not be updated automatically when a newer version of the image is pushed to the repository.
+- Avoid using latest tag.
+
+### Login
+
+To login use:
+
+```
+docker login --username=dsims
+```
+
+To push your repo use:
+
+```
+docker push username/repo
 ```
