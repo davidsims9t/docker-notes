@@ -1,5 +1,11 @@
 # Docker Notes
 
+## Table of Contents
+
+- [Hypervisor-based Virtualization][1]
+- [Docker Client][2]
+- [Docker Concepts][3]
+
 ## Hypervisor-based Virtualization
 
 - Physical Server
@@ -196,4 +202,18 @@ docker build
 - The CMD instruction doesn't run when building the image.
 - You can specify the command in either exec form or shell form.
 
-## Docker Cache
+## Push Images to DockerHub
+
+- List docker images by using:
+
+```
+docker images
+```
+
+- In order to push the image you must first link the image to a Docker account.
+- Name the repository something like dsims/repo
+- To push a repo use:
+
+```
+docker tag
+```
