@@ -19,6 +19,8 @@
 - [Docker Container Links](#docker-container-links)
 - [Docker Compose](#docker-compose)
 - [Docker Networking](#docker-networking)
+- [Unit Tests in Containers](#unit-tests-in-containers)
+- [Continuous Integration](#continuous-integration)
 
 ## Hypervisor-based Virtualization
 
@@ -409,6 +411,29 @@ docker network disconnect bridge container_3
 ### Define Network in Compose
 
 By default it sets a single network.
+
+## Unit Tests in Containers
+
+- Should test some functionality in a container without any outside resources.
+- Should run quickly as possible to avoid being blocked.
+- Spin up quick and provide a clean and isolated environment for unit tests.
+
+To run a service inside of a container use:
+
+```
+docker-compose run dockerapp python test.py
+```
+
+Pros:
+- A single image is used throughout development and production. Increases reliability.
+
+Cons:
+- Increases size of the image.
+
+## Continuous Integration
+
+- Isolated changes are immediately tested and reported when they're added to a larger code base.
+- Provides rapid feedback so if a bug is introduced it will be identified as soon as possible.
 
 ## Credit
 
