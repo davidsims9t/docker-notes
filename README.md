@@ -18,6 +18,7 @@
 - [Containerization An Application](#containerize-an-application)
 - [Docker Container Links](#docker-container-links)
 - [Docker Compose](#docker-compose)
+- [Docker Networking](#docker-networking)
 
 ## Hypervisor-based Virtualization
 
@@ -336,6 +337,78 @@ To force a rebuild of an image use:
 ```
 docker-compose build
 ```
+
+## Docker Networking
+
+Each container connects to a bridge network to connect to the host machine.
+
+### Docker Network Types
+
+- Closed Network / None Network
+- Bridge Network
+- Host Network
+- Overlay Network
+
+To see Docker networks use:
+
+```
+docker network ls
+```
+
+### None Network
+
+It's an isolated container that has no connection to the outside world.
+
+To run a closed network use:
+
+```
+docker run -d --net none image
+```
+
+- Provides the maximum level of network protection.
+- Not a good choice if network or Internet connection is required.
+- Suites well when the container requires maximum level of security.
+
+### Bridge Network Interface
+
+To create a network use:
+
+```
+docker network create --driver bridge my_bridge_network
+```
+
+To inspect a network use:
+
+```
+docker network inspect my_bridge_network
+```
+
+To disconnect from a network use:
+
+```
+docker network disconnect bridge container_3
+```
+
+- In a bridge network containers have access to 2 network interfaces (loopback and private).
+- All containers in the same network can communicate with each other.
+- Containers from different bridge networks can't connect with each other by default.
+
+### Host Network
+
+- Least protected network model, add container to host network.
+- Containers hosted on host network have full access to host's interface.
+- These containers are called open containers.
+- No isolation.
+- Host containers have best performance.
+
+### Overlay Network
+
+- Supports multi-host networks out-of-the-box.
+- Require some pre-existing conditions before it can be created (running in swarm mode).
+
+### Define Network in Compose
+
+By default it sets a single network.
 
 ## Credit
 
