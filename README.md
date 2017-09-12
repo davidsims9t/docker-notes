@@ -477,7 +477,101 @@ Amazon EC2 still uses VMs internally
 - Install Docker Engine
 - Configure Docker Client
 
+### Creating a New VM
 
+To create a new Docker VM use:
+
+```
+docker-machine create --driver digitalocean --digitalocean-access-token tag docker-app-machine
+```
+
+To setup the Docker environment use:
+
+```
+docker-machine env docker-app-machine
+```
+
+Then to see the environment variable use:
+
+```
+eval $(docker-machine env docker-app-machine)
+```
+
+### Production deployment
+
+```
+docker-compose -f prod.yml up
+```
+
+### Extends keyword
+
+- Allows for sharing of common configurations among different files or projects.
+- Can be useful if you have several different environments that re-use most configuration options.
+
+Use:
+
+```
+extends:
+  file: common.yml
+  service: redis
+```
+
+### Docker Swarm
+
+- A tool that clusters many Docker Engines and scheduled containers.
+- Decides which host to run the container based on scheduling methods.
+
+Set Digital Ocean configuration information by using:
+
+```
+export DIGITALOCEAN_ACCESS_TOKEN=
+export DIGITALOCEAN_PRIVATE_NETWORKING=true
+export DIGITALOCEAN_IMAGE=
+```
+
+### Service Discovery
+
+- Key component of most distributed systems and service oriented architectures.
+- In the context of Docker Swarm, service discovery is about how the Swarm Manager keeps track of the state of all the nodes in a cluster.
+
+### Deploy Docker App In a Swarm Cluster
+
+1. Provision a consul machine and run machine as a key-value store for service discovery.
+2. Provision a Docker swarm master node.
+3. Provision a Docker swarm slave node.
+4. Define the overlay network to support multi-host networking.
+5. Deploy out Docker app services on the Swarm cluster via Docker compose.
+
+To display the network configuration use:
+
+```
+docker-machine ssh consul ifconfig
+```
+
+To ping the private and public IPs use:
+
+```
+ping -c 1 $(docker-machine ssh consul 'ifconfig eth0 | grep "inet addr:" | cut -d: -f2 | cut -d" " -f1')
+ping -c 1 $(docker-machine ssh consul 'ifconfig eth1 | grep "inet addr:" | cut -
+```
+
+To configure Docker client to connect to consul use:
+
+```
+eval $(docker-machine env consul)
+```
+
+To create a Swarm master node use:
+
+```
+docker-machine create -d digitalocean --swarm --swarm-master --swarm-discovery="consul://${KP_IP}:8500" --engine-opt="cluster-store=consul://${KP_IP}:8500" --engine-opt="cluster-advertise=eth1:2376" master
+```
+
+To create slave nodes use:
+
+```
+docker-machine create -d digitalocean --swarm --swarm-discovery="consul://${KP_IP}:8500" --engine-opt="cluster-store=consul://${KP_IP}:8500" --engine-opt="cluster-advertise=eth1:2376" slave
+```
 
 ## Credit
 
