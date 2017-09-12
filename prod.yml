@@ -2,6 +2,8 @@ version: '2'
 services:
   dockerapp:
     image: dockerapp
+    environment:
+      - constraint:node==master
     depends_on:
       - redis
     networks:
