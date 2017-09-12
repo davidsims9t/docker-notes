@@ -21,6 +21,7 @@
 - [Docker Networking](#docker-networking)
 - [Unit Tests in Containers](#unit-tests-in-containers)
 - [Continuous Integration](#continuous-integration)
+- [Running in Production](#running-in-production)
 
 ## Hypervisor-based Virtualization
 
@@ -453,6 +454,30 @@ To their respective DockerHub credentials.
 
 1. Git commit hash of the source code.
 2. Latest
+
+## Running In Production
+
+Concerns:
+
+- There are some missing pieces about Docker around data persistence, networking, security, and identity management.
+- The ecosystem to support monitoring and logging are not still fully ready yet.
+
+A lot of companies are already using Docker in production.
+
+### Why Run It In a VM?
+
+- To address security concerns
+- Hardware level isolation
+
+Amazon EC2 still uses VMs internally
+
+### Docker Machine
+
+- Can provision new VMs
+- Install Docker Engine
+- Configure Docker Client
+
+
 
 ## Credit
 
