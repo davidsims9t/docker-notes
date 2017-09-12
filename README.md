@@ -435,6 +435,25 @@ Cons:
 - Isolated changes are immediately tested and reported when they're added to a larger code base.
 - Provides rapid feedback so if a bug is introduced it will be identified as soon as possible.
 
+### Configuring Circle CI
+
+Set DockerHub credentials in Circle CI by going to Project > Settings > Build Settings > Environmental Variables.
+
+Then set:
+
+```
+DOCKER_HUB_EMAIL
+DOCKER_HUB_PWD
+DOCKER_HUB_USER_ID
+```
+
+To their respective DockerHub credentials.
+
+### Tag the Docker Images with Two Tags
+
+1. Git commit hash of the source code.
+2. Latest
+
 ## Credit
 
 - https://www.github.com/jleetutorial/

@@ -1,6 +1,6 @@
 machine:
   pre:
-    - curl -sSL https://s3-external-1.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
   services:
     - docker
 
@@ -12,3 +12,13 @@ test:
   override:
     - docker-compose up -d
     - docker-compose run dockerapp python test.py
+
+deployment:
+  hub:
+    branch: [circle_ci_publish, master]
+    commands:
+      - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+      - docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
+      - docker tag dockerapp_dockerapp $DOCKER_HUB_USER_ID/dockerapp:latest
+      - docker push $DOCKER_HUB_USER_ID/dockerapp:$CIRCLE_SHA1
+      - docker push $DOCKER_HUB_USER_ID/dockerapp:latest
