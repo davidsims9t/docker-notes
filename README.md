@@ -22,6 +22,7 @@
 - [Unit Tests in Containers](#unit-tests-in-containers)
 - [Continuous Integration](#continuous-integration)
 - [Running in Production](#running-in-production)
+- [Kubernetes](#kubernetes)
 
 ## Hypervisor-based Virtualization
 
@@ -571,6 +572,74 @@ To create slave nodes use:
 
 ```
 docker-machine create -d digitalocean --swarm --swarm-discovery="consul://${KP_IP}:8500" --engine-opt="cluster-store=consul://${KP_IP}:8500" --engine-opt="cluster-advertise=eth1:2376" slave
+```
+
+### Kubernetes
+
+Is an open-source orchestration system for Docker containers.
+
+- Lets you schedule containers on a cluster of machines
+- You can run multiple containers on one machine
+- You can run long running services (like web applications)
+- Managed the state of these containers
+  - Can start container on specific nodes
+  - Will restart a container when it gets killed
+  - Can move containers from one node to another node
+
+- Instead of running a few docker containers manually. Kubernetes manages it for you.
+- Clusters can start with one node until thousands of nodes
+- Some other popular docker orchestrations are:
+  - Docker Swarm
+  - Mesos
+
+Kubernetes:
+  - On-premise
+  - Public (AWS)
+  - Hybrid: public & private
+
+- Highly modular
+- Open source
+- Backed by Google
+
+Docker Engine
+
+- Docker runtime
+- Software to run docker images
+
+Docker Hub
+
+- Online service to store and fetch docker images
+- Also allows you to build docker images online
+
+Kubernetes can be ran anywhere (except more integrations exists for AWS/GCE)
+
+- Things like Volumes and External Load Balancers work only with supported Cloud Providers
+- Minikube - run Kubernetes locally
+- Kops - used to spin up highly available production cluster
+
+Starting MiniKube:
+
+```
+minikube start
+```
+
+MiniKube config:
+
+```
+cat ~/.kube/config
+```
+
+Expose minikube test:
+
+```
+kubectl expose deployment hello-minikube --type=NodePort
+```
+
+Run minikube service:
+
+```
+kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --port=8080
+minikube service hello-minikube --url
 ```
 
 ## Credit
