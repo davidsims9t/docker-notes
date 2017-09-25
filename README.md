@@ -642,6 +642,60 @@ kubectl run hello-minikube --image=gcr.io/google_containers/echoserver:1.4 --por
 minikube service hello-minikube --url
 ```
 
+Stop minikube:
+
+```
+minikube stop
+```
+
+Kops setup:
+
+VM setup:
+
+```
+vagrant init ubuntu/xenial64
+```
+
+VM run:
+
+```
+vagrant up
+```
+
+Download Kops on Machine:
+
+```
+brew update && brew install kops
+```
+
+Install AWS CLI using pip. Create Kops user on AWS and give it Administrative Access.
+
+Create a subdomain using Route53 for Kubernetes: (kubernetes.domain.com).
+
+To create a kops cluster use:
+
+```
+kops create cluster --name=kubernetes.domain.com --state=s3://kobs-state-blah --zones=eu-west-1a --node-count=2 --node-size=t2.micro --master-size=t2.micro --dns-zone=kubernetes.domain.com
+```
+
+To configure the cluster use:
+
+```
+kops update cluster kubernetes.domain.com --yes
+```
+
+To edit the cluster use:
+
+```
+kops edit cluster kubernetes.domain.com
+```
+
+Or
+
+```
+kops edit cluster kubernetes.domain.com --state=s3://kops-state-blah
+```
+
 ## Credit
 
 - https://www.github.com/jleetutorial/
