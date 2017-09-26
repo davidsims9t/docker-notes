@@ -863,6 +863,105 @@ spec:
         - containerPort: 3000
 ```
 
+Useful commands:
+
+```
+kubectl get deployments - Get information on current deployments
+kubectl get rs - Get information about replica sets
+kubectl get pods --show-labels - get pods, and also show labels attached to those pods
+kubectl rollout status deployment/helloworld - Get deployment status
+kubectl set image deployment/helloworld k8s-demo=k8s-demo:2 - Run k8s-demo with image label version 2
+kubectl edit deployment/helloworld-deployment - Edit the deployment object
+kubectl rollout status deployment/helloworld-deployment - Get status of the rollout
+kubectl rollout history deployment/helloworld-deployment - Get the rollout history
+kubectl rollout undo deployment/helloworld-deployment - Rollback to previous version
+kubectl rollout undo deployment/helloworld-deployment --to-revision=n - Rollback to any version
+```
+
+### Services
+
+- Pods are very dynamic, they come and go on the Kubernetes cluster
+  - When using a Replication Controller, pods are terminated and created during scaling operations
+- When using Deployments, when updating the image version, pods are terminated and new pods take the place of older pods
+- A service is the logical bridge between the "mortal" pods and other services or end-users
+- kubectl expose creates a new service for your pod.
+- Creating a service will create an endpoint for your pod(s):
+  - A ClusterIP: a virtual IP address only reachable from within the cluster
+  - A NodePort: a port that is the same on each node that is reachable externally
+  - A LoadBalancer: a LoadBalancer created by the cloud provider that will route external traffic to every node on the NodePort (ELB on AWS)
+- The options just shown only allow you to create virtual IPs or ports
+- There is also a possibility to use DNS names
+  - ExternalName can provide a DNS name for the service
+  - e.g. for service discovery using DNS
+  - This only works when the DNS add-on is enabled
+
+Example Service definition:
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld-service
+spec:
+  ports:
+  - port: 31001
+    nodePort: 31001
+    targetPort: nodejs-port
+    protocol: TCP
+  selector:
+    app: helloworld
+  type: NodePort
+```
+
+Default services can only run between ports 30000 - 32767, but you can change this behavior by using --service-node-port-range= to kube-apiserver.
+
+### Labels
+
+- Key/value pairs that can be attached to objects
+  - Labels are like tags in AWS or other cloud providers, used to tag resources
+- You can label your objects, for instance your pod.
+  - Key: env - Value: dev / qa
+  - Key: department - Value: engineering
+- Labels are not unique and multiple labels can be added to one object
+- Once labels are attached to an object, you can use filters to narrow down results (Label Selectors)
+- Using Label Selectors, you can use matching expressions to match labels
+  - For instance, a particular pod can only run on a node labeled with "env": "dev"
+- More complex matching: "env": "dev" or "qa"
+
+### Node Labels
+
+- You can also use labels to tag nodes
+- Once nodes are tagged, you can use label selectors to let pods only run on specific nodes
+- There are 2 steps required to run a pod on a specific set of nodes:
+  - First you tag the node
+  - Then you add a nodeSelector to your pod configuration
+
+To add a label use:
+
+```
+kubectl label nodes node1 hardware=high-spec
+kubectl label nodes node2 hardware=low-spec
+```
+
+Then add a pod that uses those labels:
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: helloworld-service
+  labels:
+    app: helloworld
+spec:
+  containers:
+  - name: k8s
+    image: k8s
+    ports:
+    - containerPort: 3000
+  nodeSelector:
+    hardware: high-spec
+```
+
 ## Credit
 
 - https://www.github.com/jleetutorial/
