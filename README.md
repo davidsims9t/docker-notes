@@ -574,7 +574,7 @@ To create slave nodes use:
 docker-machine create -d digitalocean --swarm --swarm-discovery="consul://${KP_IP}:8500" --engine-opt="cluster-store=consul://${KP_IP}:8500" --engine-opt="cluster-advertise=eth1:2376" slave
 ```
 
-### Kubernetes
+## Kubernetes
 
 Is an open-source orchestration system for Docker containers.
 
@@ -617,6 +617,8 @@ Kubernetes can be ran anywhere (except more integrations exists for AWS/GCE)
 - Minikube - run Kubernetes locally
 - Kops - used to spin up highly available production cluster
 
+### MiniKube
+
 Starting MiniKube:
 
 ```
@@ -648,15 +650,15 @@ Stop minikube:
 minikube stop
 ```
 
-Kops setup:
+### Kops
 
-VM setup:
+Virtual Machine setup:
 
 ```
 vagrant init ubuntu/xenial64
 ```
 
-VM run:
+Virtual Machine run:
 
 ```
 vagrant up
@@ -721,6 +723,7 @@ spec:
   - name: k8s-demo
     image: my-image
   ports:
+  - name: nodejs-port
   - containerPort: 3000
 ```
 
@@ -741,6 +744,29 @@ kubectl attach <podname> -i - Attach to the pod
 kubectl exec <pod> -- command - Execute a command on the pod
 kubectl label pods <pod> mylabel=awesome - Add a new label to a pod
 kubectl run -i --tty busybox --image=busybox --restart=Never -- sh - Run a shell in a pod - very useful for debugging
+```
+
+### Load Balancers
+
+On AWS the load balancer will route the traffic to the correct pod in Kubernetes.
+
+You can use haproxy or nginx load balancer in front of your cluster. Expose port directly.
+
+To setup a service with a load balancer use:
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld-service
+spec:
+  ports:
+  - port: 80
+    targetPort: nodejs-port
+    protocol: TCP
+  selector:
+    app: helloworld
+type: LoadBalancer
 ```
 
 ## Credit
