@@ -769,6 +769,100 @@ spec:
 type: LoadBalancer
 ```
 
+### Basics
+
+Internet traffic is directed to a load balancer which then does a look-up on the iptables. IPTables then directs traffic to pods containing Docker containers. Kubelet/kube-proxy also does a look-up against iptables.
+
+### Scaling
+
+If your application is stateless then you can horizontally scale it.
+
+- Stateless means that it doesn't write any local files or keep local sessions.
+- All traditional databases (MySQL/Postgres) are stateful, they have database files that can't be split over multiple instances.
+
+Most web applications can be made stateless.
+
+- Session management needs to be done outside the container.
+- Scaling in Kubernetes can be done using the Replication Controller.
+- The replication controller will ensure a specified number of pod replicas will run at all time.
+- A pods created with the replica controller will automatically be replaced if they fail, get deleted, or are terminated.
+- Using the replication controller is also recommended if you just want to make sure 1 pod is always running, even after reboots
+  - You can then run a plication controller with just 1 replica
+  - This makes sure that the pod is always running
+
+To replicate an app 2 times using the Replication controller:
+
+```
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: helloworld-controller
+spec:
+  replicas: 2
+  selector:
+    app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: k8s-demo
+        port:
+        - containerPort: 3000
+```
+
+Via CLI you can use:
+
+```
+kubectl scale --replicas=4 -f config.yml
+```
+
+Replication Set
+
+- Replica Set is the next-generation Replication Controller
+- It supports a new selector that can do selection based on filtering according to a set of values
+  - "environment" can be "dev" or "qa"
+  - not based on equality
+
+- Replica Set is used by Deployment object
+
+- A deployment declaration in Kubernetes allows you to do app deployments and updates
+- When using the deployment object, you define the state of your application
+  - Kubernetes will then make sure the clusters matches your desired state
+- Using the replication controller or replication set might be cumbersome to deploy apps
+  - The Deployment Object is easier to use and gives you more possibilities
+
+With a deployment object you can:
+
+- Create a deployment (deploy an app)
+- Update a deployment (deploy a new version of an app)
+- Rolling updates (zero downtime deployments)
+- Roll back to a previous version
+- Pause/resume a deployment (e.g. to roll-out to only a certain percentage)
+
+Example deployment:
+
+```
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: helloworld-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+      - name: k8s-demo
+        image: k8s-demo
+        ports:
+        - containerPort: 3000
+```
+
 ## Credit
 
 - https://www.github.com/jleetutorial/
