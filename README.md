@@ -1,4 +1,4 @@
-# Docker Notes
+# Docker & Kubernetes Notes
 
 ## Table of Contents
 
@@ -23,6 +23,16 @@
 - [Continuous Integration](#continuous-integration)
 - [Running in Production](#running-in-production)
 - [Kubernetes](#kubernetes)
+- [MiniKube](#minikube)
+- [Kops](#kops)
+- [Load Balancers](#load-balancers)
+- [Basics](#basics)
+- [Scaling](#scaling)
+- [Labels](#labels)
+- [Node Labels](#node-labels)
+- [Health Checks](#health-checks)
+- [Secrets](#secrets)
+- [Web UI](#web-ui)
 
 ## Hypervisor-based Virtualization
 
@@ -961,6 +971,143 @@ spec:
   nodeSelector:
     hardware: high-spec
 ```
+
+### Health Checks
+
+- If your application malfunctions, the pod and container can still be running, but the application might not work anymore.
+- To detect and resolve problems with your application, you can run health checks.
+- You can run 2 different type of health checks
+  - Running a command in the container periodically
+  - Periodic checks on a URL (HTTP)
+- The typical production application behind a load balancer should always have health checks implemented in some way to ensure availability and resiliency of the app.
+
+Example of health checks:
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nodehelloworld.example.com
+  labels:
+    app: helloworld
+spec:
+  containers:
+  - name: k8s
+    image: k8s
+    ports:
+    - containerPort: 3000
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 3000
+      initialDelaySeconds: 15
+      timeoutSeconds: 30
+```
+
+### Secrets
+
+- Secrets provides a way in Kubernetes to distribute credentials, keys, passwords or "secret" data to the pods.
+- Kubernetes itself uses this Secrets mechanism to provide the credentials to access the internal API.
+- You can also use the same mechanism to provide secrets to your application.
+- Secrets is one way to provide secrets, native to Kubernetes.
+  - There are still other ways your container can get its secrets if you don't want to use Secrets (e.g. using an external vault service)
+- Can be used as environment variables.
+- Use secrets as a file in a pod
+  - This setup uses volumes to be mounted in a container
+  - In this volume you have files
+  - Can be used for instance for dotenv files or your app can just read this file
+- Use an external image to pull secrets (from a private image registry)
+
+To generate secrets using files:
+
+```
+kubectl create secret generic db-user-pass --from-file=./username.txt --from-file=./password.txt
+```
+
+A secret can also be generated from an SSH key or SSL certificate:
+
+```
+kubectl create secret generic ssl-certificate --from-file=ssh-privatekey=~./ssh/id_rsa --ssl-cert-=ssl-cert=mysslcert.crt
+```
+
+To generate secrets using yaml definitions:
+
+secrets-db-secret.yml
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  password:
+  username:
+```
+
+Then use:
+
+```
+kubectl create -f secrets-db-secret.yml
+```
+
+Using secrets:
+
+```
+spec:
+  env:
+    - name: SECRET_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: db-secret
+        key: username
+    - name: SECRET_PASSWORD
+```
+
+Or:
+
+```
+spec:
+  volumeMounts:
+  - name: credvolume
+    mountPath: /etc/creds
+    readOnly: true
+  volumes:
+  - name: credvolume
+    secret:
+      secretName: db-secrets
+```
+
+### Web UI
+
+- Kubernetes comes with a Web UI you can use instead of the kubectl commands
+- Get an overview of your cluster
+- Creating and modifying individual Kubernetes settings
+- If a password is asked you can retrieve the password by using:
+
+```
+kubectl config view
+```
+
+To launch the dashboard:
+
+```
+minikube dashboard
+```
+
+### Advanced Topics
+
+#### Service Discovery
+
+As of Kubernetes 1.3 DNS is built-in that's launched automatically.
+
+- The addons are in the /etc/kubernetes/addons directory on master node.
+- The DNS service can be used within pods to find other services running on the same cluster
+- Multiple containers within 1 pod don't need this service, as they can contact each other directly
+- A container in the same pod can connect the port of the other container using localhost:port.
+- To make DNS work, a pod will need a Service definition
+
+You only need the name of the service to get back the IP address of the pod so long as they're in the same namespace.
 
 ## Credit
 
