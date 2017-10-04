@@ -1191,6 +1191,22 @@ spec:
             servicePort: 80
 ```
 
+### Volumes
+
+- Volumes in Kubernetes allow you to store state outside the container
+- When a container stops, all data on the container itself is lost
+- Persistent volumes in Kubernetes allow you to attach a volume to a container that will exist even when the container stops
+
+Volumes can be attached using different volume plugins.
+
+Containers in a pod can be used to attach a volume.
+
+Using volumes you could deploy applications with state on your cluster, such as:
+
+- Applications that need to read/write on the local file system that need to be persistent in time
+- You could run MySQL using persistent volumes
+- Volume can be attached to a new node if the original node is destroyed
+
 ## Credit
 
 - https://www.github.com/jleetutorial/
