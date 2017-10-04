@@ -1109,6 +1109,88 @@ As of Kubernetes 1.3 DNS is built-in that's launched automatically.
 
 You only need the name of the service to get back the IP address of the pod so long as they're in the same namespace.
 
+### Config Map
+
+- Configuration parameters that are not secret, can be put in a ConfigMap.
+- The input is key - value pairs.
+- The ConfigMap key-value pairs can then be read by the app using:
+  - Environment variables
+  - Container command-line arguments
+  - Using volumes
+- The ConfigMap can also contain full configuration files
+- This file can be mounted using volumes where the application expects its config file
+- This way you can inject configuration settings into containers without changing the container itself
+
+To generate configmap using files:
+
+```
+cat <<EOF > app.properties
+driver=jdbc
+database=postgres
+lookandfeel=1
+otherparams=xyz
+param.with.hierarchy=xyz
+EOF
+```
+
+```
+kubectl create configmap app-config --from-file=app.properties
+```
+
+```
+spec:
+  containers:
+  volumeMounts:
+  - name: config-volume
+    mountPath: /etc/config
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config
+  env:
+    - name: DRIVER
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: driver
+    - name: DATABASE
+```
+
+To return the ConfigMap use:
+
+```
+kubectl get configmap app-config
+```
+
+### Ingress
+
+- Allows inbound connections to the cluster
+- It's an alternative to the external LoadBalancer and nodePorts
+  - Allows you to easily expose services that need to accessible from outside the cluster
+- With Ingress you can run your own ingress controller (basically a loadbalancer) within the Kubernetes cluster
+- There are default Ingress controllers available, or you can write your own ingress controller
+
+Scenario:
+
+Internet -> Ingress Controller (NGINX) -> pod 1
+Internet -> Ingress Controller (NGINX) -> pod 2
+
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: helloworld-rules
+spec:
+  rules:
+  - host: helloworld-v1.example.com
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: helloworld-v1
+            servicePort: 80
+```
+
 ## Credit
 
 - https://www.github.com/jleetutorial/
