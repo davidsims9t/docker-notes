@@ -38,6 +38,8 @@
 - [Config Map](#config-map)
 - [Volumes](#volumes)
 - [Volume Provisioning](#volume-provisioning)
+- [Pet Sets](#pet-sets)
+- [Daemon Sets](#daemon-sets)
 
 ## Hypervisor-based Virtualization
 
@@ -1278,6 +1280,73 @@ spec:
       persistentVolumeClaim:
         claimName: myclaim
 ```
+
+### Pet Sets
+
+- New feature in v1.3 alpha
+- Introduce to create stateful application that need:
+  - A stable pod hostname
+    - Your podname will have an index when having multiple instances of a pod
+  - A stateful app that requires multiple pods with volumes based on their ordinal number (podname-x)
+    - Currently deleting and/or scaling a PetSet down will not delete the volumes associated with the PetSet.
+
+- A pet set will allow your stateful app to use DNS to find other peers
+  - Cassandra clusters, Elasticsearch clusters, use DNS to find other members of the cluster
+- One running node of your Pet Set is called a Pet (e.g. one node in Cassandra).
+- Using Pet Sets you can run for instance 5 cassandra nodes on Kubernetes named cassandra-1 until cassandra-5
+- If you wouldn't use Pet Sets, you would get a dynamic hostname, which you wouldn't be able to use it in your configuration file.
+
+- A pet set will also allow your stateful application to order your start-up and tear-down of the pets.
+  - Instead of randomly terminating one Pet, you'll know which one goes
+  - This is useful if you first need to drain the data from a node before it can be shut down
+
+### Daemon Sets
+
+- Daemon sets ensure that every single node in the cluster in the Kubernetes cluster runs the same pod resource.
+  - This is useful if you want to ensure that a certain pod is running on every single Kubernetes node.
+- When a node is added to the cluster, a new pod will be started on that automatically.
+- Same when the node is removed, the pod will not be rescheduled on another node.
+
+Typical use cases:
+
+- Logging aggregators
+- Monitoring
+- Load Balancers / Reverse Proxies / API Gateways
+- Running a daemon that only needs one instance per physical instance
+
+```
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: monitoring-agent
+  labels:
+    app: monitoring-agent
+spec:
+  template:
+    metadata:
+      labels:
+        name: monitoring-agent
+    spec:
+      containers:
+      - name: k8s
+        image: k8s
+        ports:
+          - name: nodejs-port
+            containerPort: 3000
+```
+
+### Resource Usage Monitoring
+
+- Heapster enables container cluster monitoring and performance analysis
+- It provides a monitoring platform for Kubernetes
+- It's a prerequisite if you want to do pod auto-scaling
+- Heapster exports cluster metrics via REST endpoints
+- You can use different backends with Heapster
+- Visualizations can be shown using Grafana
+  - The Kubernetes dashboard will also show graphs once monitoring is enabled
+- All can be started in pods
+
+Heapster (https://github.com/kubernetes/heapster)
 
 ## Credit
 
