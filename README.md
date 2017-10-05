@@ -33,6 +33,11 @@
 - [Health Checks](#health-checks)
 - [Secrets](#secrets)
 - [Web UI](#web-ui)
+- [Ingress](#ingress)
+- [Advanced Topics](#advanced-topics)
+- [Config Map](#config-map)
+- [Volumes](#volumes)
+- [Volume Provisioning](#volume-provisioning)
 
 ## Hypervisor-based Virtualization
 
@@ -1206,6 +1211,73 @@ Using volumes you could deploy applications with state on your cluster, such as:
 - Applications that need to read/write on the local file system that need to be persistent in time
 - You could run MySQL using persistent volumes
 - Volume can be attached to a new node if the original node is destroyed
+
+To remove the volume from the pod use:
+
+```
+kubectl drain pod
+```
+
+To create an AWS EC2 volume use:
+
+```
+aws ec2 delete-volume --volume-id vol-hash
+```
+
+### Volume Provisioning
+
+- The Kubernetes plugin allows you to provision storage for you
+- The AWS Plugin can for instance provision storage for you by creating the volumes in AWS before attaching them to a node
+- This is done using the StorageClass Object
+- To use the auto provisioned volumes you can create storage.yml:
+
+```
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta
+metadata:
+  name: standard
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  zone: us-east-1
+```
+
+Volume Claim:
+
+```
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "standard"
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 8Gi
+```
+
+To launch the pod use:
+
+```
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+        - mountPath: "/var/www/html"
+          name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim
+```
 
 ## Credit
 
