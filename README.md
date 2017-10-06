@@ -40,6 +40,7 @@
 - [Volume Provisioning](#volume-provisioning)
 - [Pet Sets](#pet-sets)
 - [Daemon Sets](#daemon-sets)
+- [Autoscaling](#autoscaling)
 
 ## Hypervisor-based Virtualization
 
@@ -1347,6 +1348,59 @@ spec:
 - All can be started in pods
 
 Heapster (https://github.com/kubernetes/heapster)
+
+### Autoscaling
+
+- Kubernetes has the possibility to automatically scale pods based on metrics
+- Kubernetes can automatically scale a Deployment, ReplicationController, or Replica
+- In Kubernetes 1.3 scaling based on CPU usage is possible out of the box
+  - With alpha support, application based metrics are also available (like queries per second or average request latency)
+    - To enable this, the cluster has to be started with the env var ENABLE_CUSTOM_METRICS to true
+- Autoscaling with periodically query the utilization for the targeted pods
+  - By default it is every 30 seconds, but can be changed using 'horizontal-pod-scaler-sync-period'
+    when launching the controller-manager
+- Autoscaling will use heapster, the monitoring tool, to gather its metrics and make scaling decisions
+- Run a deployment with a pod with a CPU resource request of 200m
+  - 200m = 200 millicpu (20% single CPU core of a node)
+- Horizontal Pod Autoscaling will increase/decrease pods to maintain a target CPU utilization of 50%
+
+```
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hpa-example
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hpa-example
+  spec:
+    containers:
+    - name: hpa-example
+      image: gcr.io/google_containers/hpa-example
+      ports:
+      - name: http-port
+        containerPort: 80
+      resources:
+        requests:
+          cpu: 200m
+```
+
+```
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-example-autoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: hpa-example
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+```
 
 ## Credit
 
