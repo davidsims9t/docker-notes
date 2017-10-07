@@ -1402,6 +1402,116 @@ spec:
   targetCPUUtilizationPercentage: 50
 ```
 
+### Resource management
+
+- When a Kubernetes cluster is used by multiple people or teams, resource management becomes more important.
+  - You want to be able to manage the resources you give to a person or a team
+  - You don't want the person or team taking up all the resources
+- You can divide your cluster into namespaces and enable resource quotas on it
+  - You can do this using the ResourceQuota and ObjectQuota objects
+- Each container can specify request capacity and capacity limits
+  - Resource capacity is an explicit request for resources
+    - The scheduler can use the request capacity to make decisions where to put the pod on
+    - You can set it as a minimum amount of resources the pods need
+  - Resource limit is a limit imposed to the container
+    - The container will not be able to utilize more resources than specified
+
+Example Resource Quotas:
+
+- You run a deployment with a pod with a CPU resource request of 200m
+- 200m = 200 millicpu (200 millicores)
+- 200m = 0.2 (20% of CPU core)
+- Memory quotas as defined as MiB or GiB
+- If a capacity quota (e.g. mem/cpu) has been specified by the administrator, then each
+pod needs to specify capacity quota during creation
+  - The administrator can specify default request values for pods that don't specify any values for
+capacity
+  - The same for valid limit quotas
+- If a resource is requested more than allowed capacity, the server API will give a 403 forbidden error
+
+### Set Resource Quotas
+
+requests.cpu - the sum of all CPU requests can exceed this value
+requests.mem - The sum of all MEM requests of all pods cannot exceed this value
+requests.storage - The sum of storage requests of all persistent volume claims cannot exceed this value
+limits.cpu - The sum of the CPU limits of all pods cannot exceed this value
+limits.memory - The sum of MEM limits of all pods cannot exceed this value
+
+The administrator can set the following objects:
+
+configmaps - total number of configmaps that can exist in a namespace
+persistentvolumeclaims - total number of persistent volume claims that can exist in a namespace
+pods - total number of pods that can exist in a namespace
+replicationcontrollers - total number of replicationcontrollers that exist in a namespace
+resourcequotas - total number of resource quotas that can exist in a namespace
+services - total number of services that exist in a namespace
+services.loadbalancer - total number of load balancers that can exist in a namespace
+services.nodeports - total number of node ports that can exist in a namespace
+secrets - total number of secrets that can exist in a namespace
+
+### Namespaces
+
+- Namespaces allow you to create virtual clusters within the same virtual cluster
+- Namespaces logically separates your cluster
+- The standard default namespace is called default and that's where all resources are launched by default
+  - There is also a namespace for kubernetes specific resources, called kube-system
+- Namespaces are intended when you have multiple teams / projects using the same cluster
+- The name across resources need to be unique within a namespace, but not across namespaces
+- You can limit resources on a per namespace basis
+
+To create a namespace:
+
+```
+kubectl create namespace myspace
+```
+
+To get namespaces use:
+
+```
+kubectl get namespaces
+```
+
+You can set the default namespace using:
+
+```
+export CONTEXT=$(kubectl config view | awk '/current_context/ {print $2}')
+kubectl config set-context $CONTEXT --namespace=myspace
+```
+
+Then to create the resource limits within that namespace:
+
+```
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: computer-resources
+  namespace: myspace
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+```
+
+Create object limits:
+
+```
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: object-counts
+  namespace: myspace
+spec:
+  hard:
+    configmaps: "10"
+    persistentvolumeclaims: "10"
+    replicationcontrollers: "20"
+    secrets: "10"
+    services: "10"
+    services.loadbalancers: "2"
+```
+
 ## Credit
 
 - https://www.github.com/jleetutorial/
