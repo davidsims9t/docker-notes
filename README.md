@@ -41,6 +41,7 @@
 - [Pet Sets](#pet-sets)
 - [Daemon Sets](#daemon-sets)
 - [Autoscaling](#autoscaling)
+- [](#)
 
 ## Hypervisor-based Virtualization
 
@@ -1511,6 +1512,57 @@ spec:
     services: "10"
     services.loadbalancers: "2"
 ```
+
+### User Management
+
+There are 2 different types of users you can create
+
+- A normal user meant to access the user externally
+  - User not managed through objects
+- A service user, which is managed by objects in Kubernetes
+  - This is the type of user used to authenticate within the cluster
+  - From within a pod or from kubelet
+  - Credentials are managed like secrets
+- There are multiple authentication strategies for normal users
+  - Client certificates
+  - Bearer tokens
+  - Authentication proxy
+  - HTTP Basic Authentication
+  - OpenID
+  - Webhooks
+
+- Service users use service account tokens
+- They are stored as credentials using secrets
+  - Those secrets are also stored in pods to allow communication between the services
+- Service users are specific to a namespace
+- Any API call that is not authenticated is considered to be an anonymous user
+- Independently from the authentication mechanism, normal users have the following attributes:
+  - A username
+  - A UID
+  - Groups
+  - Extra fields
+
+- After a normal user authenticates they will have access to everything.
+- To limit access, you need to configure authorization
+- There are multiple offerings to choose from:
+  - Always Allow / Always Deny
+  - ABAC (Attribute-Based Access Control)
+- RBAC (Role-Based Access Control)
+- Webhook (authorized by remote service)
+
+- Authorization is still a work in progress
+- The ABAC needs to be configured manually
+- RBAC uses rbac.authorization.k8s.io API group
+  - This allows admins to dynamically configure permissions through the API
+
+### Networking
+
+- The approach to networking is quite different than the default Docker setup
+- Kubernetes assumes that pods should be able to communicate to other pods, regardless of which
+node they are running
+  - Every pod has its own IP address
+  - Pods on different nodes need to be able to communicate to each other using those IP addresses
+  - Implemented differently depending on your networking setup
 
 ## Credit
 
