@@ -41,7 +41,12 @@
 - [Pet Sets](#pet-sets)
 - [Daemon Sets](#daemon-sets)
 - [Autoscaling](#autoscaling)
-- [](#)
+- [Resource Management](#resource-management)
+- [Namespaces](#namespaces)
+- [User Management](#user-management)
+- [Networking](#networking)
+- [Node Maintenance](#node-maintenance)
+- [High Availability](#high-availability)
 
 ## Hypervisor-based Virtualization
 
@@ -1403,7 +1408,7 @@ spec:
   targetCPUUtilizationPercentage: 50
 ```
 
-### Resource management
+### Resource Management
 
 - When a Kubernetes cluster is used by multiple people or teams, resource management becomes more important.
   - You want to be able to manage the resources you give to a person or a team
@@ -1430,7 +1435,7 @@ capacity
   - The same for valid limit quotas
 - If a resource is requested more than allowed capacity, the server API will give a 403 forbidden error
 
-### Set Resource Quotas
+#### Set Resource Quotas
 
 requests.cpu - the sum of all CPU requests can exceed this value
 requests.mem - The sum of all MEM requests of all pods cannot exceed this value
@@ -1563,6 +1568,56 @@ node they are running
   - Every pod has its own IP address
   - Pods on different nodes need to be able to communicate to each other using those IP addresses
   - Implemented differently depending on your networking setup
+
+- On AWS: kubenet networking
+- Alternatives:
+  - Container Networking Interface (CNI)
+    - Software that provides libraries / plugins for network interfaces within containers
+    - Popular solutions include Calico and Weave
+  - An overlay network
+    - Flannel is an easy and popular way
+
+### Node Maintenance
+
+- NodeController is responsible for managing the Node objects
+  - It assigns an IP space to the node when a new node is launched
+  - It keeps the node list up-to-date with the available machines
+  - The node controller is also monitoring the health of the node
+    - If a node is unhealthy it gets deleted
+    - Pods running on the unhealthy node will get rescheduled
+
+- When adding a new node, the kubelet will attempt to register itself
+- This is called self-registration and is the default behavior
+- It allows you to easily add more nodes to the cluster without making API changes yourself
+- A new node object is automatically created with:
+  - The metadata (IP or hostname)
+  - Labels (cloud region / availability zone / instance size)
+- A node also has a node condition (e.g. Ready, OutOfDisk)
+- When you want to decommission a node, you want to do it gracefully
+  - You drain the node before you shut it down or take it out of the cluster
+- To drain a node you use the following command:
+
+```
+kubectl drain nodename --grace-period=600
+```
+
+If the node runs pods not managed by a controller use:
+
+```
+kubectl drain nodename --force
+```
+
+### High Availability
+
+- If you're going to run your cluster in production, you're going to want to have all master
+services in a high availability (HA) setup
+- The setup looks like this:
+  - Clustering etcd: run at least 3 etcd nodes
+  - Replicated API servers with a LoadBalancer
+  - Running multiple instances of the scheduler and the controllers
+    - Only one is the leader and the rest are on stand-by
+- A cluster like minikube does not HA, it is only one cluster
+- If you are going to use a cluster on AWS, kops can do the heavy lifting for you
 
 ## Credit
 
